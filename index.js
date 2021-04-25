@@ -8,9 +8,8 @@ fastify.register(require("point-of-view"), {
   },
 })
 //declare routes
-fastify.get('/', async (request, reply) => {
-  reply.sendFile('index.html') 
-})
+fastify.register(require("./routes/static"))
+fastify.register(require("./routes/ssr"))
 
 const start = async () => {
   try {
