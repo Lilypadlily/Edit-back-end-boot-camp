@@ -1,8 +1,13 @@
-//initial fastify
+//initialization fastify and server
 const fastify = require("fastify")({ logger: false })
-
+//register plugin
 fastify.register(require("fastify-static"), require("./config/static").public)
-
+fastify.register(require("point-of-view"), {
+  engine: {
+    ejs: require("ejs"),
+  },
+})
+//declare routes
 fastify.get('/', async (request, reply) => {
   reply.sendFile('index.html') 
 })
