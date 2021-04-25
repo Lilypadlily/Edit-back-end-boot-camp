@@ -14,7 +14,9 @@
     "ejs": "^3.1.6",
     "fastify": "^3.15.0",
     "fastify-env": "^2.1.0",
+    "fastify-postgres": "^3.5.0",
     "fastify-static": "^4.0.1",
+    "pg": "^8.6.0",
     "point-of-view": "^4.14.0"
   },
   "nodemonConfig": {
