@@ -1,22 +1,19 @@
-const fastify = require("fastify")({ logger: false });
-const path = require('path')
+//initial fastify
+const fastify = require("fastify")({ logger: false })
 
+fastify.register(require("fastify-static"), require("./config/static").public)
 
-fastify.register(require('fastify-static'), {
-  root: path.join(__dirname, '/public'),
-  prefix: '/', // optional: default '/'
+fastify.get('/', async (request, reply) => {
+  reply.sendFile('index.html') 
 })
 
-fastify.get('/awal', function (req, reply) {
-    return reply.sendFile('/portfolio.html') 
-  })
-
-  const start = async () => {
-    try {
-      await fastify.listen(3000)
-    } catch (err) {
-      fastify.log.error(err)
-      process.exit(1)
-    }
+const start = async () => {
+  try {
+    await fastify.listen(process.env.PORT, "0.0.0.0")
+  } catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
   }
-  start()
+}
+
+start()
