@@ -8,9 +8,9 @@ module.exports = {
       description: "REST API for BE Bootcamp 2021",
       version: "0.0.1",
       contact: {
-        name: "Braga Tech Support",
-        url: "https://braga.co.id/contact",
-        email: "jherjati@braga.co.id",
+        name: "Iftika Rahmi F",
+        url: "disini url",
+        email: "iftikarahmif@gmail.com",
       },
     },
     externalDocs: {
@@ -22,7 +22,13 @@ module.exports = {
         name: "Profile",
         description: "Profile items related routes",
       },
+      {
+        name: "Auth",
+        description:
+          "Auth related endpoints, playground for token manipulation",
+      },
     ],
+  
     components: {
       securitySchemes: {
         Bearer: {

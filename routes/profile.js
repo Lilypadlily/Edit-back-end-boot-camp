@@ -34,10 +34,19 @@ async function routes(fastify, options) {
           "5xx": { ...BasicMessage, description: "Failed response" },
         },
         body: BasicItem,
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
       },
+      preValidation: [fastify.authenticate],
     },
     async (req, reply) => {
       try {
+        const { email } = req.user;
+        if (email !== "admin@admin.com") throw Error("wey, anda bukan admin");
+
         const {
           filter,
           imgSrc,
@@ -74,10 +83,19 @@ async function routes(fastify, options) {
         },
         body: BasicItem,
         params: BasicId,
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
       },
+      preValidation: [fastify.authenticate],
     },
     async (req, reply) => {
       try {
+        const { email } = req.user;
+        if (email !== "admin@admin.com") throw Error("wey, anda bukan admin");
+
         const {
           filter,
           imgSrc,
@@ -135,16 +153,25 @@ async function routes(fastify, options) {
           "2xx": { ...BasicMessage, description: "Successful item deletion" },
           "5xx": { ...BasicMessage, description: "Failed response" },
         },
+        security: [
+          {
+            Bearer: [],
+          },
+        ],
         params: BasicId,
       },
+      preValidation: [fastify.authenticate],
     },
     async (req, reply) => {
       try {
+        const { email } = req.user;
+        if (email !== "admin@admin.com") throw Error("You are not admin");
+
         const returnVal = await fastify.pg.query(
           `DELETE FROM profiles WHERE id=$1;`,
           [req.params.id]
         );
-        return { message: `sukses ngapus ${returnVal.rowCount} item` };
+        return { message: `Deleting success ${returnVal.rowCount} item` };
       } catch (err) {
         return err;
       }

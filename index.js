@@ -14,11 +14,19 @@ fastify.register(require("fastify-static"), require("./config/static").public)
 fastify.register(require("point-of-view"), require("./config/view"))
 fastify.register(require("fastify-jwt"), require("./config/jwt"))
 fastify.register(require("fastify-swagger"), require("./config/swagger"))
+//jwt authentication login
+fastify.decorate("authenticate", async function (request, reply) {
+  try {
+    await req.jwtVerify();
+  } catch (err) {
+    reply.send(err);
+  }
+})
 //declare routes
 fastify.register(require("./routes/static"))
 fastify.register(require("./routes/ssr"))
 fastify.register(require("./routes/profile"), { prefix: "/api/profiles" })
-fastify.register(require("./routes/profile"), { prefix: "/api/auth" })
+fastify.register(require("./routes/auth"), { prefix: "/api/auth" })
 // just until day 7 boot camp
 //fastify.register(require("./routes/api"), { prefix: "/api" }) 
 // Run the server!

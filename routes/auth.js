@@ -1,23 +1,40 @@
-const { BasicId, BasicMessage, BasicItem } = require("../schema");
+const { BasicMessage } = require("../schema");
 
 async function routes(fastify, options) {
-  fastify.get(
-    "/",
+  fastify.post(
+    "/signup",
     {
       schema: {
-        tags: ["Profile"],
+        tags: ["Auth"],
         response: {
+          "2xx": {
+            type: "object",
+            properties: { token: { type: "string" } },
+            description: "Successful signup",
+          },
           "5xx": { ...BasicMessage, description: "Failed response" },
+        },
+        body: {
+          type: "object",
+          properties: {
+            email: { type: "string" },
+            password: { type: "string" },
+          },
+          description: "Successful login",
         },
       },
     },
     async (req, reply) => {
       try {
-        const { rows: returnVal } = await fastify.pg.query(
-          `SELECT * FROM profiles;`,
-          []
+        const { email, password } = req.body;
+        const { rows } = await fastify.pg.query(
+          ` INSERT INTO user_auth (email, unhashed_password)
+            VALUES 
+                ($1, $2)
+            RETURNING email;`,
+          [email, password]
         );
-        return returnVal;
+        return { token: fastify.jwt.sign(rows[0]) };
       } catch (err) {
         return err;
       }
@@ -25,126 +42,43 @@ async function routes(fastify, options) {
   );
 
   fastify.post(
-    "/",
+    "/login",
     {
       schema: {
-        tags: ["Profile"],
+        tags: ["Auth"],
         response: {
-          "2xx": { ...BasicMessage, description: "Successful items addition" },
+          "2xx": {
+            type: "object",
+            properties: { token: { type: "string" } },
+            description: "Successful login",
+          },
           "5xx": { ...BasicMessage, description: "Failed response" },
         },
-        body: BasicItem,
+        body: {
+          type: "object",
+          properties: {
+            email: { type: "string" },
+            password: { type: "string" },
+          },
+          description: "Successful login",
+        },
       },
     },
     async (req, reply) => {
       try {
+        const { email, password } = req.body;
+
         const {
-          filter,
-          imgSrc,
-          title,
-          summary,
-          galleryHref,
-          galleryTitle,
-        } = req.body;
-
-        const returnVal = await fastify.pg.query(
-          ` INSERT INTO profiles (fltr, imgSrc, title, summary, galleryHref, galleryTitle)
-            VALUES 
-                ($1, $2, $3, $4, $5, $6)
-            RETURNING id ;`,
-          [filter, imgSrc, title, summary, galleryHref, galleryTitle]
+          rows,
+        } = await fastify.pg.query(
+          ` SELECT hashed_password FROM user_auth WHERE email=$1; `,
+          [email]
         );
-        console.log(returnVal);
 
-        return { message: "Sukses guys" };
-      } catch (err) {
-        return err;
-      }
-    }
-  );
+        if (rows.length === 0) throw Error("Email tidak terdaftar");
+        if (password !== rows[0].hashed_password) throw Error("Password salah");
 
-  fastify.put(
-    "/:id",
-    {
-      schema: {
-        tags: ["Profile"],
-        response: {
-          "2xx": { ...BasicMessage, description: "Successful item uodate" },
-          "5xx": { ...BasicMessage, description: "Failed response" },
-        },
-        body: BasicItem,
-        params: BasicId,
-      },
-    },
-    async (req, reply) => {
-      try {
-        const {
-          filter,
-          imgSrc,
-          title,
-          summary,
-          galleryHref,
-          galleryTitle,
-        } = req.body;
-
-        const returnVal = await fastify.pg.query(
-          ` UPDATE profiles
-            SET
-                fltr = $1, imgSrc = $2, title = $3, summary = $4, galleryHref = $5, galleryTitle = $6
-            WHERE id = $7;`,
-          [
-            filter,
-            imgSrc,
-            title,
-            summary,
-            galleryHref,
-            galleryTitle,
-            req.params.id,
-          ]
-        );
-        console.log(returnVal);
-
-        return { message: "Sukses guys" };
-      } catch (err) {
-        return err;
-      }
-    }
-  );
-
-  fastify.get(
-    "/:id",
-    {
-      schema: { tags: ["Profile"], params: BasicId },
-    },
-    async (req, reply) => {
-      const {
-        rows: returnVal,
-      } = await fastify.pg.query(`SELECT * FROM profiles WHERE id=$1;`, [
-        req.params.id,
-      ]);
-      return returnVal;
-    }
-  );
-
-  fastify.delete(
-    "/:id",
-    {
-      schema: {
-        tags: ["Profile"],
-        response: {
-          "2xx": { ...BasicMessage, description: "Successful item deletion" },
-          "5xx": { ...BasicMessage, description: "Failed response" },
-        },
-        params: BasicId,
-      },
-    },
-    async (req, reply) => {
-      try {
-        const returnVal = await fastify.pg.query(
-          `DELETE FROM profiles WHERE id=$1;`,
-          [req.params.id]
-        );
-        return { message: `sukses ngapus ${returnVal.rowCount} item` };
+        return { token: fastify.jwt.sign({ email }) };
       } catch (err) {
         return err;
       }

@@ -1,3 +1,3 @@
-fastify.register(require('fastify-jwt'), {
-    secret: 'supersecret'
-  });
+module.exports = {
+  secret: process.env.JWT_SECRET,
+}
