@@ -60,16 +60,25 @@ DELETE FROM profiles WHERE id!=1;
 
 -- CRUD ROWS FOR USER AUTH
 --@block
+SELECT 
+   table_name, 
+   column_name, 
+   data_type 
+FROM 
+   information_schema.columns
+WHERE 
+   table_name = 'user_auth';
+--@block
 CREATE TABLE user_auth (
         email VARCHAR(50) PRIMARY KEY,
-        unhashed_password varchar(255),
+        unhashed_password varchar(255)
       
     );
 --@block
-INSERT INTO user_auth (email, hashed_password)
+INSERT INTO user_auth (email, unhashed_password)
 VALUES 
     ('admin@admin.com', 'string')
-RETURNING email
+RETURNING email;
 
 --@block
 SELECT * FROM user_auth;
@@ -85,4 +94,4 @@ SET
 WHERE id = 4;
 
 --@block
-DELETE FROM user_auth WHERE email='string';
+DELETE FROM user_auth WHERE TRUE;

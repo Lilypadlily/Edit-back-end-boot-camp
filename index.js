@@ -1,5 +1,9 @@
 //initialization fastify and server
 const fastify = require("fastify")({ logger: true })
+const argon2 = require('argon2')
+const pg = require('pg')
+const QueryStream = require('pg-query-stream')
+const JSONStream = require('JSONStream')
 //register plugin
 if (process.env.NODE_ENV !== "production")
   require("dotenv").config(require("./config/env").options.dotenv)

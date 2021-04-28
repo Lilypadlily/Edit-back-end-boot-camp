@@ -34,6 +34,7 @@ async function routes(fastify, options) {
             RETURNING email;`,
           [email, password]
         );
+        
         return { token: fastify.jwt.sign(rows[0]) };
       } catch (err) {
         return err;
