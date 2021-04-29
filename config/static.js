@@ -1,8 +1,6 @@
-const path = require("path")
+const path = require("path");
 
 module.exports = {
-  public: {
-    root: path.join(__dirname, "../public"),
-    prefix: "/",
-  },
-}
+  root: path.join(__dirname, "../public"),
+  prefix: "/",
+};

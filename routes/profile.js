@@ -1,6 +1,7 @@
 const { BasicId, BasicMessage, BasicItem } = require("../schema");
 const QueryStream = require("pg-query-stream");
 const JSONStream = require("JSONStream");
+
 async function routes(fastify, options) {
   fastify.get(
     "/",
@@ -20,11 +21,6 @@ async function routes(fastify, options) {
         const jsonStream = stream.pipe(JSONStream.stringify());
         jsonStream.on("end", client.release);
         reply.send(jsonStream);
-        const { rows: returnVal } = await fastify.pg.query(
-          `SELECT * FROM profiles;`,
-          []
-        );
-        return returnVal;
       } catch (err) {
         return err;
       }
@@ -52,7 +48,8 @@ async function routes(fastify, options) {
     async (req, reply) => {
       try {
         const { email } = req.user;
-        if (email !== "admin@admin.com") throw Error("wey, anda bukan admin");
+        if (email !== process.env.ADMIN_EMAIL)
+          throw Error("wey, anda bukan admin");
 
         const {
           filter,
@@ -101,7 +98,8 @@ async function routes(fastify, options) {
     async (req, reply) => {
       try {
         const { email } = req.user;
-        if (email !== "admin@admin.com") throw Error("wey, anda bukan admin");
+        if (email !== process.env.ADMIN_EMAIL)
+          throw Error("wey, anda bukan admin");
 
         const {
           filter,
@@ -172,13 +170,14 @@ async function routes(fastify, options) {
     async (req, reply) => {
       try {
         const { email } = req.user;
-        if (email !== "admin@admin.com") throw Error("You are not admin");
+        if (email !== process.env.ADMIN_EMAIL)
+          throw Error("wey, anda bukan admin");
 
         const returnVal = await fastify.pg.query(
           `DELETE FROM profiles WHERE id=$1;`,
           [req.params.id]
         );
-        return { message: `Deleting success ${returnVal.rowCount} item` };
+        return { message: `sukses ngapus ${returnVal.rowCount} item` };
       } catch (err) {
         return err;
       }
@@ -186,4 +185,4 @@ async function routes(fastify, options) {
   );
 }
 
-module.exports = routes
+module.exports = routes;
