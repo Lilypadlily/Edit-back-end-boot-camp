@@ -1,5 +1,6 @@
 const { BasicId, BasicMessage, BasicItem } = require("../schema");
-
+const QueryStream = require("pg-query-stream");
+const JSONStream = require("JSONStream");
 async function routes(fastify, options) {
   fastify.get(
     "/",
@@ -13,6 +14,12 @@ async function routes(fastify, options) {
     },
     async (req, reply) => {
       try {
+        const client = await fastify.pg.connect();
+        const query = new QueryStream("SELECT * FROM profiles;", []);
+        const stream = client.query(query);
+        const jsonStream = stream.pipe(JSONStream.stringify());
+        jsonStream.on("end", client.release);
+        reply.send(jsonStream);
         const { rows: returnVal } = await fastify.pg.query(
           `SELECT * FROM profiles;`,
           []

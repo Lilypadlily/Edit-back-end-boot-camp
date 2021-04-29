@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production")
     ...require("./config/env").options,
     dotenv: false,
   })
-
+const helmet = require('fastify-helmet')
 fastify.register(require("fastify-postgres"), require("./config/postgres"))
 fastify.register(require("fastify-static"), require("./config/static").public)
 fastify.register(require("point-of-view"), require("./config/view"))
