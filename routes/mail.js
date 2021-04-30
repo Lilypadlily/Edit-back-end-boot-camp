@@ -51,7 +51,7 @@ async function routes(fastify, options) {
 
         let info = await transporter.sendMail({
           from: `Braga Email Service <${fastify.env.BRAGA_EMAIL}>`,
-          to: "jherjati@gmail.com",
+          to: "iftikarahmif@gmail.com",
           subject: subject.value,
           text: `You got a message from ${nameValue} (${email.value}). The message is : ${message.value}`,
         });

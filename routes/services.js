@@ -1,4 +1,4 @@
-const { BasicId, BasicMessage, BasicItem } = require("../schema");
+const { BasicId, BasicMessage, BasicItem } = require("../schema/index_services");
 const QueryStream = require("pg-query-stream");
 const JSONStream = require("JSONStream");
 
@@ -7,7 +7,7 @@ async function routes(fastify, options) {
     "/",
     {
       schema: {
-        tags: ["Profile"],
+        tags: ["Service"],
         response: {
           "5xx": { ...BasicMessage, description: "Failed response" },
         },
@@ -16,7 +16,7 @@ async function routes(fastify, options) {
     async (req, reply) => {
       try {
         const client = await fastify.pg.connect();
-        const query = new QueryStream("SELECT * FROM profiles;", []);
+        const query = new QueryStream("SELECT * FROM services;", []);
         const stream = client.query(query);
         const jsonStream = stream.pipe(JSONStream.stringify());
         jsonStream.on("end", client.release);
@@ -31,7 +31,7 @@ async function routes(fastify, options) {
     "/",
     {
       schema: {
-        tags: ["Profile"],
+        tags: ["Services"],
         response: {
           "2xx": { ...BasicMessage, description: "Successful items addition" },
           "5xx": { ...BasicMessage, description: "Failed response" },
@@ -61,7 +61,7 @@ async function routes(fastify, options) {
         } = req.body;
 
         const returnVal = await fastify.pg.query(
-          ` INSERT INTO profiles (fltr, imgSrc, title, summary, galleryHref, galleryTitle)
+          ` INSERT INTO services (fltr, imgSrc, title, summary, galleryHref, galleryTitle)
             VALUES 
                 ($1, $2, $3, $4, $5, $6)
             RETURNING id ;`,
@@ -80,7 +80,7 @@ async function routes(fastify, options) {
     "/:id",
     {
       schema: {
-        tags: ["Profile"],
+        tags: ["Services"],
         response: {
           "2xx": { ...BasicMessage, description: "Successful item uodate" },
           "5xx": { ...BasicMessage, description: "Failed response" },
@@ -111,7 +111,7 @@ async function routes(fastify, options) {
         } = req.body;
 
         const returnVal = await fastify.pg.query(
-          ` UPDATE profiles
+          ` UPDATE services
             SET
                 fltr = $1, imgSrc = $2, title = $3, summary = $4, galleryHref = $5, galleryTitle = $6
             WHERE id = $7;`,
@@ -137,12 +137,12 @@ async function routes(fastify, options) {
   fastify.get(
     "/:id",
     {
-      schema: { tags: ["Profile"], params: BasicId },
+      schema: { tags: ["Services"], params: BasicId },
     },
     async (req, reply) => {
       const {
         rows: returnVal,
-      } = await fastify.pg.query(`SELECT * FROM profiles WHERE id=$1;`, [
+      } = await fastify.pg.query(`SELECT * FROM services WHERE id=$1;`, [
         req.params.id,
       ]);
       return returnVal;
@@ -153,7 +153,7 @@ async function routes(fastify, options) {
     "/:id",
     {
       schema: {
-        tags: ["Profile"],
+        tags: ["Services"],
         response: {
           "2xx": { ...BasicMessage, description: "Successful item deletion" },
           "5xx": { ...BasicMessage, description: "Failed response" },
@@ -174,7 +174,7 @@ async function routes(fastify, options) {
           throw Error("Anda bukan admin");
 
         const returnVal = await fastify.pg.query(
-          `DELETE FROM profiles WHERE id=$1;`,
+          `DELETE FROM services WHERE id=$1;`,
           [req.params.id]
         );
         return { message: `Sukses Terhapus ${returnVal.rowCount} item` };
