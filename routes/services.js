@@ -61,11 +61,11 @@ async function routes(fastify, options) {
         } = req.body;
 
         const returnVal = await fastify.pg.query(
-          ` INSERT INTO services (fltr, imgSrc, title, summary, galleryHref, galleryTitle)
+          ` INSERT INTO services ( imgSrc, title, summary, galleryHref)
             VALUES 
-                ($1, $2, $3, $4, $5, $6)
+                ($1, $2, $3, $4)
             RETURNING id ;`,
-          [filter, imgSrc, title, summary, galleryHref, galleryTitle]
+          [ imgSrc, title, summary, galleryHref]
         );
         console.log(returnVal);
 
@@ -102,26 +102,22 @@ async function routes(fastify, options) {
           throw Error("Anda bukan admin");
 
         const {
-          filter,
           imgSrc,
           title,
           summary,
           galleryHref,
-          galleryTitle,
         } = req.body;
 
         const returnVal = await fastify.pg.query(
           ` UPDATE services
             SET
-                fltr = $1, imgSrc = $2, title = $3, summary = $4, galleryHref = $5, galleryTitle = $6
-            WHERE id = $7;`,
+                 imgSrc = $1, title = $2, summary = $3, galleryHref = $4
+            WHERE id = $5;`,
           [
-            filter,
             imgSrc,
             title,
             summary,
             galleryHref,
-            galleryTitle,
             req.params.id,
           ]
         );

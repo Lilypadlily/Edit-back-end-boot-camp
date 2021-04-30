@@ -23,6 +23,7 @@ fastify.decorate("authenticate", async function (req, reply) {
 fastify.register(require("./routes/static"));
 fastify.register(require("./routes/ssr"));
 fastify.register(require("./routes/profile"), { prefix: "/api/profiles" });
+fastify.register(require("./routes/services"), { prefix: "/api/services" });
 fastify.register(require("./routes/auth"), { prefix: "/api/auth" });
 fastify.register(require("./routes/mail"), { prefix: "/api/mail" });
 fastify.register(require("./routes/placeholder"), {prefix: "/api/placeholder"});
