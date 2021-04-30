@@ -1,4 +1,4 @@
-const { BasicId, BasicMessage, BasicItem } = require("../schema/index_services");
+const { BasicId, BasicMessage, BasicItem } = require("../schema");
 const QueryStream = require("pg-query-stream");
 const JSONStream = require("JSONStream");
 
@@ -7,7 +7,7 @@ async function routes(fastify, options) {
     "/",
     {
       schema: {
-        tags: ["Service"],
+        tags: ["Services"],
         response: {
           "5xx": { ...BasicMessage, description: "Failed response" },
         },
@@ -52,12 +52,10 @@ async function routes(fastify, options) {
           throw Error("Anda bukan admin");
 
         const {
-          filter,
           imgSrc,
           title,
           summary,
           galleryHref,
-          galleryTitle,
         } = req.body;
 
         const returnVal = await fastify.pg.query(
